@@ -17,7 +17,7 @@ export default function AdminSidebar() {
             href="/admin/products"
             className="hover:bg-white/10 px-3 py-2 rounded-full"
           >
-            Quản lý sản phẩm
+            Quản lý trang thiết bị Y tế
           </Link>
           <Link
             href="/admin/orders"
