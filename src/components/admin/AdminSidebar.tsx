@@ -8,18 +8,18 @@ export default function AdminSidebar() {
         <h2 className="text-xl font-semibold mb-8">Admin Dashboard</h2>
         <nav className="flex flex-col gap-4 overflow-y-auto">
           <Link
-            href="/admin/home"
+            href="/admin"
             className="hover:bg-white/10 px-3 py-2 rounded-full"
           >
             Trang chủ
           </Link>
           <Link
-            href="/admin/products"
+            href="/admin/quan-ly-trang-thiet-bi"
             className="hover:bg-white/10 px-3 py-2 rounded-full"
           >
             Quản lý trang thiết bị Y tế
           </Link>
-          <Link
+          {/* <Link
             href="/admin/orders"
             className="hover:bg-white/10 px-3 py-2 rounded-full"
           >
@@ -30,7 +30,7 @@ export default function AdminSidebar() {
             className="hover:bg-white/10 px-3 py-2 rounded-full"
           >
             Quản lý người dùng
-          </Link>
+          </Link> */}
         </nav>
       </div>
       {/* Phần dưới: các nút luôn nằm cuối */}

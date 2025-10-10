@@ -7,35 +7,12 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { FaShoppingCart, FaUser } from "react-icons/fa";
-import Cart from "./Cart";
-import { ICartItem } from "../server/entity";
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [submenuOpen, setSubmenuOpen] = useState<null | string>(null);
   const [showModal, setShowModal] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
-  const [cartItemCount, setCartItemCount] = useState(1);
-  const [openCartModal, setOpenCartModal] = useState(false);
-  const [cartItems, setCartItems] = useState<ICartItem[]>([]);
-
-  const onUpdateQuantity = (id: number, quantity: number) => {
-    const updatedCartItems = cartItems.map((item) =>
-      item.id === id ? { ...item, quantity } : item
-    );
-    setCartItems(updatedCartItems);
-    setCartItemCount(
-      updatedCartItems.reduce((sum, item) => sum + item.quantity, 0)
-    );
-  };
-
-  const onRemove = (id: number) => {
-    const updatedCartItems = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedCartItems);
-    setCartItemCount(
-      updatedCartItems.reduce((sum, item) => sum + item.quantity, 0)
-    );
-  };
 
   useEffect(() => {
     if (session?.user) {
@@ -67,11 +44,9 @@ export default function Navbar() {
             <div className="flex space-x-5">
               <Link
                 href="/"
-                className="text-white px-3 py-2 rounded transition hover:text-fuchsia-200 hover:bg-white/10"
-              >
+                className="text-white px-3 py-2 rounded transition hover:text-fuchsia-200 hover:bg-white/10">
                 Trang chủ
               </Link>
-
               {/* Dropdown Sản phẩm */}
               <div
                 className="relative"
@@ -79,8 +54,7 @@ export default function Navbar() {
                 onMouseLeave={() => {
                   setDropdownOpen(false);
                   setSubmenuOpen(null);
-                }}
-              >
+                }}>
                 <button className="text-white px-3 py-2 rounded transition hover:text-fuchsia-200 hover:bg-white/10 flex items-center">
                   Sản phẩm
                 </button>
@@ -91,16 +65,14 @@ export default function Navbar() {
                     <div
                       className="relative group"
                       onMouseEnter={() => setSubmenuOpen("sneaker")}
-                      onMouseLeave={() => setSubmenuOpen(null)}
-                    >
+                      onMouseLeave={() => setSubmenuOpen(null)}>
                       <button className="w-full flex items-center gap-2 px-5 py-3 transition hover:bg-indigo-700 rounded-xl">
                         Sneaker
                         <svg
                           className="w-3 h-3 ml-auto"
                           fill="none"
                           stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
+                          viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -114,14 +86,12 @@ export default function Navbar() {
                         <div className="absolute left-full top-0 w-48 bg-gradient-to-tr from-blue-600 via-indigo-500 to-fuchsia-500 text-white shadow-lg rounded-xl z-50 border border-indigo-200">
                           <Link
                             href="/shoes/sneakers/men"
-                            className="block px-4 py-2 rounded transition hover:bg-white/10 hover:text-fuchsia-200"
-                          >
+                            className="block px-4 py-2 rounded transition hover:bg-white/10 hover:text-fuchsia-200">
                             Nam
                           </Link>
                           <Link
                             href="/shoes/sneakers/women"
-                            className="block px-4 py-2 rounded transition hover:bg-white/10 hover:text-indigo-200"
-                          >
+                            className="block px-4 py-2 rounded transition hover:bg-white/10 hover:text-indigo-200">
                             Nữ
                           </Link>
                         </div>
@@ -132,16 +102,14 @@ export default function Navbar() {
                     <div
                       className="relative group"
                       onMouseEnter={() => setSubmenuOpen("sandal")}
-                      onMouseLeave={() => setSubmenuOpen(null)}
-                    >
+                      onMouseLeave={() => setSubmenuOpen(null)}>
                       <button className="w-full flex items-center gap-2 px-5 py-3 transition hover:bg-indigo-700 rounded-xl">
                         Sandal
                         <svg
                           className="w-3 h-3 ml-auto"
                           fill="none"
                           stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
+                          viewBox="0 0 24 24">
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -154,14 +122,12 @@ export default function Navbar() {
                         <div className="absolute left-full top-0 w-48 bg-gradient-to-tr from-blue-600 via-indigo-500 to-fuchsia-500 text-white shadow-lg rounded-xl z-50">
                           <Link
                             href="/shoes/sandals/men"
-                            className="block px-4 py-2 rounded transition hover:bg-white/10 hover:text-fuchsia-200"
-                          >
+                            className="block px-4 py-2 rounded transition hover:bg-white/10 hover:text-fuchsia-200">
                             Nam
                           </Link>
                           <Link
                             href="/shoes/sandals/women"
-                            className="block px-4 py-2 rounded transition hover:bg-white/10 hover:text-indigo-200"
-                          >
+                            className="block px-4 py-2 rounded transition hover:bg-white/10 hover:text-indigo-200">
                             Nữ
                           </Link>
                         </div>
@@ -171,30 +137,24 @@ export default function Navbar() {
                     {/* Boot không có submenu */}
                     <Link
                       href="/shoes/boots"
-                      className="flex items-center gap-2 px-5 py-3 transition hover:bg-indigo-700 rounded-xl"
-                    >
+                      className="flex items-center gap-2 px-5 py-3 transition hover:bg-indigo-700 rounded-xl">
                       Boot
                     </Link>
                   </div>
                 )}
               </div>
-
               {/* Giới thiệu */}
               <Link
                 href="/about"
-                className="text-white px-3 py-2 rounded transition hover:text-fuchsia-200 hover:bg-white/10"
-              >
+                className="text-white px-3 py-2 rounded transition hover:text-fuchsia-200 hover:bg-white/10">
                 Giới thiệu
               </Link>
-
               {/* Liên hệ */}
               <Link
                 href="/contact"
-                className="text-white px-3 py-2 rounded transition hover:text-fuchsia-200 hover:bg-white/10"
-              >
+                className="text-white px-3 py-2 rounded transition hover:text-fuchsia-200 hover:bg-white/10">
                 Liên hệ
               </Link>
-
               {session?.user ? (
                 <div className="flex items-center gap-2">
                   <img
@@ -207,45 +167,25 @@ export default function Navbar() {
                   />
                   <button
                     onClick={() => signOut()}
-                    className="px-5 py-2 bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white rounded-lg font-semibold shadow hover:scale-105"
-                  >
+                    className="px-5 py-2 bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white rounded-lg font-semibold shadow hover:scale-105">
                     Đăng xuất
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={() => setShowModal(true)}
-                  className="px-5 py-2 bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white rounded-lg font-semibold shadow hover:scale-105"
-                >
+                  className="px-5 py-2 bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white rounded-lg font-semibold shadow hover:scale-105">
                   Đăng nhập / Đăng ký
                 </button>
               )}
-              <button
-                onClick={() => setOpenCartModal(true)}
-                className="relative flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white rounded-lg shadow hover:scale-105 transition"
-              >
-                <FaShoppingCart />
-                Giỏ hàng
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-2 py-0.5">
-                    {cartItemCount}
-                  </span>
-                )}
-              </button> 
+              <FaShoppingCart />
+              Giỏ hàng
             </div>
           </div>
         </div>
       </nav>
       <Modal open={showModal} onClose={() => setShowModal(false)}>
         <AuthForm />
-      </Modal>
-      <Modal open={openCartModal} onClose={() => setOpenCartModal(false)}>
-        <Cart
-          cartItems={cartItems}
-          onUpdateQuantity={onUpdateQuantity}
-          onRemove={onRemove}
-          setOpenCartModal={setOpenCartModal}
-        />
       </Modal>
     </>
   );
