@@ -8,6 +8,9 @@ import { Device } from "@/server/entity";
 export default function QuanLyTrangThietBiPage() {
   const [open, setOpen] = useState(false);
   const [initialData, setInitialData] = useState<Device | null>(null);
+  const onSubmit = (value: Device) => {
+    console.log(value);
+  };
   const handleAdd = () => {
     setOpen(true);
     setInitialData(null);
@@ -16,9 +19,14 @@ export default function QuanLyTrangThietBiPage() {
     setOpen(true);
     setInitialData(record);
   };
-  const handleSubmit = () => {
-    setOpen(false);
-    setInitialData(null);
+  const handleSubmit = async (value: Device) => {
+    try {
+      onSubmit(value);
+      setOpen(false);
+      setInitialData(null);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   };
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -33,8 +41,17 @@ export default function QuanLyTrangThietBiPage() {
         open={open}
         footer={null}
         closeIcon={false}
-        width={1200}
-        onCancel={() => setOpen(false)}>
+        centered
+        width={{
+          xs: "90%",
+          sm: "80%",
+          md: "70%",
+          lg: "60%",
+          xl: "50%",
+          xxl: "40%",
+        }}
+        onCancel={() => setOpen(false)}
+      >
         <AdminProductForm
           initialData={initialData}
           onSubmit={handleSubmit}

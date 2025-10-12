@@ -4,8 +4,14 @@ export enum IRole {
     MANAGER = "MANAGER"
 }
 export enum IStatus {
-    USING = "Using",
-    NOT_USING = "Not Using",
+    NEW = "Mới chưa  cấp",
+    OLD = "Cũ còn SD tốt ",
+    DAMAGED = "Hỏng, chờ thanh lý  ",
+    SOLD = "Xuất  kho",
+}
+export enum IStatusOfUse {
+    USING = "Sử dụng",
+    NOT_USING = "Không sử dụng",
 }
 export enum ICategory {
     CDHA = "Thiết bị chẩn đoán hình ảnh",
@@ -33,7 +39,17 @@ export enum ILocation {
     KMT = "Nhà kho mái tôn cổng 2",
     GAXE = "GARA XE",
 }
-
+export enum IDepartment {
+    HSCC = "KHOA KHÁM - HSCC",
+    LNP = "KHOA LAO NGOÀI PHỔI VÀ BỆNH PHỔI",
+    LHH = "KHOA LAO HÔ HẤP",
+    DCLS = " KHOA DƯỢC - CẬN LÂM SÀNG",
+    KHTH = "PHÒNG KẾ HOẠCH TỔNG HỢP - CHỈ ĐẠO TUYẾN",
+    KSNK = "PHÒNG ĐIỀU DƯỠNG - DINH DƯỠNG - KIỂM SOÁT NHIỂM KHUẨN ",
+    TCHC = "PHÒNG TỔ CHỨC HÀNH CHÍNH",
+    TCKT = "PHÒNG TÀI CHÍNH KẾ TOÁN",
+    GD = "BAN GIÁM ĐỐC",
+}
 export enum IClassification {
     A = "A",
     B = "B",
@@ -49,7 +65,7 @@ export interface Device {
     assetSource: string;
     yearOfSupply: string;
     price: number;
-    statusOfUse: string;
+    statusOfUse: IStatusOfUse;
     status: IStatus;
     timeIn: string;
     timeOut: string;
@@ -58,8 +74,9 @@ export interface Device {
     classification: IClassification;
     category: ICategory;
     location: ILocation;
-    department: string;
+    department: IDepartment;
     timeCheck: string;
     maintenance: string;
     image: string;
+    note: string;
 }

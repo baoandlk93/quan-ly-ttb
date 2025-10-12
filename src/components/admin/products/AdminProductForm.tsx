@@ -1,13 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ICategory, Device, IClassification, ILocation } from "@/server/entity";
+import {
+  ICategory,
+  Device,
+  IClassification,
+  ILocation,
+  IStatus,
+  IStatusOfUse,
+  IDepartment,
+} from "@/server/entity";
 export default function AdminProductForm({
   initialData,
   onSubmit,
   onClose,
 }: {
   initialData: Device | null;
-  onSubmit: (data: Device) => void;
+  onSubmit: (data: Device) => Promise<void>;
   onClose: () => void;
 }) {
   const [name, setName] = useState("");
@@ -20,11 +28,11 @@ export default function AdminProductForm({
   const [classification, setClassification] = useState<IClassification | "">(
     ""
   );
-  const [statusOfUse, setStatusOfUse] = useState("");
+  const [statusOfUse, setStatusOfUse] = useState<IStatusOfUse | "">("");
+  const [status, setStatus] = useState<IStatus | "">("");
   const [timeUse, setTimeUse] = useState("");
   const [timeIn, setTimeIn] = useState("");
   const [timeOut, setTimeOut] = useState("");
-  const [status, setStatus] = useState("");
   const [department, setDepartment] = useState("");
   const [location, setLocation] = useState<ILocation | "">("");
   const [yearOfSupply, setYearOfSupply] = useState("");
@@ -33,25 +41,53 @@ export default function AdminProductForm({
   const [stock, setStock] = useState("");
   const [model, setModel] = useState("");
   const [company, setCompany] = useState("");
+  const [note, setNote] = useState("");
 
   useEffect(() => {
     if (initialData) {
       setName(initialData.name || "");
       setDeviceCode(initialData.deviceCode || "");
+      setYearOfSupply(initialData.yearOfSupply || "");
+      setStock(initialData.stock.toString() || "");
+      setTimeUse(initialData.timeUse || "");
+      setTimeIn(initialData.timeIn || "");
+      setTimeOut(initialData.timeOut || "");
+      setDepartment(initialData.department || "");
+      setLocation(initialData.location || "");
+      setClassification(initialData.classification || "");
+      setCategory(initialData.category || "");
       setQuantity(initialData.quantity.toString() || "");
       setAssetSource(initialData.assetSource || "");
       setPrice(initialData.price.toString() || "");
       setImage(initialData.image || "");
-      setCategory(initialData.category || "");
       setStock(initialData.stock.toString() || "");
+      setStatus(initialData.status || "");
+      setStatusOfUse(initialData.statusOfUse || "");
       setModel(initialData.model || "");
       setCompany(initialData.company || "");
+      setNote(initialData.note || "");
     } else {
       setName("");
       setPrice("");
       setImage("");
       setCategory("");
       setStock("");
+      setQuantity("");
+      setAssetSource("");
+      setYearOfSupply("");
+      setTimeUse("");
+      setTimeIn("");
+      setTimeOut("");
+      setDepartment("");
+      setLocation("");
+      setClassification("");
+      setCategory("");
+      setStock("");
+      setStatus("");
+      setStatusOfUse("");
+      setModel("");
+      setCompany("");
+      setNote("");
     }
   }, [initialData]);
 
@@ -71,14 +107,15 @@ export default function AdminProductForm({
       quantity: Number(quantity),
       assetSource: assetSource,
       yearOfSupply: yearOfSupply,
-      statusOfUse: statusOfUse,
+      statusOfUse: statusOfUse as IStatusOfUse,
+      status: status as IStatus,
       timeUse: timeUse,
       timeIn: timeIn,
       timeOut: timeOut,
-      status: status,
-      department: department,
+      department: department as IDepartment,
       timeCheck: timeCheck,
       maintenance: maintenance,
+      note: note,
     });
     onClose();
   };
@@ -86,25 +123,23 @@ export default function AdminProductForm({
   return (
     <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-screen mx-auto animate-fadeIn">
       <h2 className="text-2xl font-bold mb-4 text-center">
-        {initialData ? "Cập nhật sản phẩm" : "Thêm sản phẩm mới"}
+        {initialData ? "Cập nhật thiết bị" : "Thêm thiết bị mới"}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-gray-700 font-medium mb-1">
-            Mã sản phẩm
-          </label>
+          <label className="block text-gray-700 font-medium mb-1">Mã TTB</label>
           <input
             type="text"
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             value={deviceCode}
             onChange={(e) => setDeviceCode(e.target.value)}
             required
-            placeholder="Nhập mã sản phẩm..."
+            placeholder="Nhập mã TTB..."
           />
         </div>
         <div>
           <label className="block text-gray-700 font-medium mb-1">
-            Tên sản phẩm
+            Tên TTB
           </label>
           <input
             type="text"
@@ -112,7 +147,7 @@ export default function AdminProductForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            placeholder="Nhập tên sản phẩm..."
+            placeholder="Nhập tên TTB..."
           />
         </div>
         <div>
@@ -125,7 +160,7 @@ export default function AdminProductForm({
             value={model}
             onChange={(e) => setModel(e.target.value)}
             required
-            placeholder="Nhập model sản phẩm..."
+            placeholder="Nhập model TTB..."
           />
         </div>
         <div>
@@ -138,7 +173,7 @@ export default function AdminProductForm({
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             required
-            placeholder="Nhập hãng sản phẩm..."
+            placeholder="Nhập hãng sản xuất..."
           />
         </div>
         <div>
@@ -152,7 +187,7 @@ export default function AdminProductForm({
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             required
-            placeholder="Nhập số lượng sản phẩm..."
+            placeholder="Nhập số lượng TTB..."
           />
         </div>
         <div>
@@ -179,11 +214,13 @@ export default function AdminProductForm({
             value={yearOfSupply}
             onChange={(e) => setYearOfSupply(e.target.value)}
             required
-            placeholder="Nhập năm cấp sản phẩm..."
+            placeholder="Nhập năm cấp TTB..."
           />
         </div>
         <div>
-          <label className="block text-gray-700 font-medium mb-1">Giá</label>
+          <label className="block text-gray-700 font-medium mb-1">
+            Giá TTB (VNĐ)
+          </label>
           <input
             type="number"
             min="0"
@@ -191,21 +228,46 @@ export default function AdminProductForm({
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
-            placeholder="Nhập giá sản phẩm..."
+            placeholder="Nhập giá TTB..."
           />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Vị trí</label>
+          <select
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={location}
+            onChange={(e) => setLocation(e.target.value as ILocation)}
+            required
+          >
+            <option value="" disabled>
+              Chọn vị trí...
+            </option>
+            {Object.entries(ILocation).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Tình trạng sử dụng tài sản
           </label>
-          <input
-            type="text"
+          <select
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             value={statusOfUse}
-            onChange={(e) => setStatusOfUse(e.target.value)}
+            onChange={(e) => setStatusOfUse(e.target.value as IStatusOfUse)}
             required
-            placeholder="Nhập tình trạng sử dụng..."
-          />
+          >
+            <option value="" disabled>
+              Chọn tình trạng sử dụng...
+            </option>
+            {Object.entries(IStatus).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label className="block text-gray-700 font-medium mb-1">
@@ -226,13 +288,14 @@ export default function AdminProductForm({
           </label>
           <select
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-            value={category}
+            value={status}
             onChange={(e) => setStatus(e.target.value as IStatus)}
-            required>
+            required
+          >
             <option value="" disabled>
-              Chọn loại sản phẩm...
+              Chọn tình trạng TTB YT...
             </option>
-            {Object.entries(ICategory).map(([key, value]) => (
+            {Object.entries(IStatus).map(([key, value]) => (
               <option key={key} value={value}>
                 {value}
               </option>
@@ -263,6 +326,19 @@ export default function AdminProductForm({
             onChange={(e) => setTimeOut(e.target.value)}
             required
             placeholder="Nhập thời gian xuất kho..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Thời gian kiểm định
+          </label>
+          <input
+            type="date"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={timeCheck}
+            onChange={(e) => setTimeCheck(e.target.value)}
+            required
+            placeholder="Nhập thời gian kiểm định..."
           />
         </div>
         <div>
@@ -303,17 +379,7 @@ export default function AdminProductForm({
             </div>
           )}
         </div>
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">Mô tả</label>
-          <textarea
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition resize-none"
-            value={""}
-            onChange={(e) => {}}
-            required
-            rows={3}
-            placeholder="Nhập mô tả sản phẩm..."
-          />
-        </div>
+
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Loại thiết bị
@@ -322,11 +388,54 @@ export default function AdminProductForm({
             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             value={category}
             onChange={(e) => setCategory(e.target.value as ICategory)}
-            required>
+            required
+          >
             <option value="" disabled>
               Chọn loại thiết bị...
             </option>
             {Object.entries(ICategory).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Phân loại TTB ( A, B, C,D)
+          </label>
+          <select
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={classification}
+            onChange={(e) =>
+              setClassification(e.target.value as IClassification)
+            }
+            required
+          >
+            <option value="" disabled>
+              Chọn phân loại TTB...
+            </option>
+            {Object.entries(IClassification).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Khoa/phòng
+          </label>
+          <select
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={department}
+            onChange={(e) => setDepartment(e.target.value as IDepartment)}
+            required
+          >
+            <option value="" disabled>
+              Chọn khoa/phòng...
+            </option>
+            {Object.entries(IDepartment).map(([key, value]) => (
               <option key={key} value={value}>
                 {value}
               </option>
@@ -347,16 +456,31 @@ export default function AdminProductForm({
             placeholder="Nhập số lượng trong kho..."
           />
         </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Ghi chú
+          </label>
+          <textarea
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition resize-none"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            required
+            rows={3}
+            placeholder="Nhập ghi chú..."
+          />
+        </div>
         <div className="flex justify-end gap-3 pt-2">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition">
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition"
+          >
             Huỷ
           </button>
           <button
             type="submit"
-            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow transition">
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow transition"
+          >
             {initialData ? "Cập nhật" : "Thêm mới"}
           </button>
         </div>
