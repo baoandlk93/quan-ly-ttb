@@ -178,8 +178,6 @@ export default function Navbar() {
                   Đăng nhập / Đăng ký
                 </button>
               )}
-              <FaShoppingCart />
-              Giỏ hàng
             </div>
           </div>
         </div>

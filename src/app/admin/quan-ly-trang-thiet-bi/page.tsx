@@ -2,7 +2,7 @@
 
 import AdminTable from "@/components/AdminTable";
 import { Button, Modal } from "antd";
-import AdminProductForm from "@/components/admin/products/AdminProductForm";
+import AddEquipmentForm from "@/components/admin/products/AddEquipmentForm";
 import { useState } from "react";
 import { Device } from "@/server/entity";
 export default function QuanLyTrangThietBiPage() {
@@ -50,9 +50,8 @@ export default function QuanLyTrangThietBiPage() {
           xl: "50%",
           xxl: "40%",
         }}
-        onCancel={() => setOpen(false)}
-      >
-        <AdminProductForm
+        onCancel={() => setOpen(false)}>
+        <AddEquipmentForm
           initialData={initialData}
           onSubmit={handleSubmit}
           onClose={() => setOpen(false)}

@@ -1,38 +1,45 @@
-'use client'
-import { IRole, IUser } from "@/server/entity";
+"use client";
+import { ERole, IUser } from "@/server/entity";
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { SubmitHandler } from "react-hook-form";
+const API_URL = process.env.API_URL;
 interface IFormInput {
   name: string;
   username: string;
   password: string;
   confirmPassword: string;
-  role: IRole;
+  role: ERole;
 }
 export default function Register() {
   const { register, handleSubmit } = useForm<IFormInput>();
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
     const user: IUser = {
       id: "",
-      name: data.name,
+      fullName: data.name,
       username: data.username,
       password: data.password,
-      role: IRole.USER,
+      role: ERole.USER,
+      address: "",
+      email: "",
+      phoneNumber: "",
     };
-    fetch("/api/auth/register", {
+    axios({
+      url: `http://localhost:8080/api/auth/register`,
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(user),
-    });
+      data: JSON.stringify(user),
+    })
+      .then((res) => {})
+      .catch((e) => {});
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col space-y-4 text-black"
-    >
+      className="flex flex-col space-y-4 text-black">
       <input
         {...register("name")}
         type="text"
@@ -67,8 +74,7 @@ export default function Register() {
       />
       <button
         type="submit"
-        className="bg-gradient-to-r from-blue-500 to-fuchsia-500 py-3 rounded-lg text-white font-semibold shadow hover:scale-105 transition"
-      >
+        className="bg-gradient-to-r from-blue-500 to-fuchsia-500 py-3 rounded-lg text-white font-semibold shadow hover:scale-105 transition">
         Đăng ký
       </button>
     </form>
