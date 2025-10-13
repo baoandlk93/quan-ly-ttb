@@ -5,23 +5,23 @@ export enum ERole {
 }
 export interface IRole {
   id?: number;
-  name?: String;
-  description?: String;
+  name?: string;
+  description?: string;
 }
 export interface IUser {
-  id?: String;
-  fullName?: String;
-  username?: String;
-  password?: String;
+  id?: number;
+  fullName?: string;
+  username?: string;
+  password?: string;
   role: ERole;
-  email?: String;
-  phoneNumber?: String;
-  address?: String;
+  email?: string;
+  phoneNumber?: string;
+  address?: string;
 }
 export interface IWarehouse {
-  id?: String;
-  name?: String;
-  description?: String;
+  id?: number;
+  name?: string;
+  description?: string;
 }
 export enum IStatus {
   NEW = "Mới chưa  cấp",
@@ -59,17 +59,12 @@ export enum ELocation {
   KMT = "Nhà kho mái tôn cổng 2",
   GAXE = "GARA XE",
 }
-export enum IDepartment {
-  HSCC = "KHOA KHÁM - HSCC",
-  LNP = "KHOA LAO NGOÀI PHỔI VÀ BỆNH PHỔI",
-  LHH = "KHOA LAO HÔ HẤP",
-  DCLS = " KHOA DƯỢC - CẬN LÂM SÀNG",
-  KHTH = "PHÒNG KẾ HOẠCH TỔNG HỢP - CHỈ ĐẠO TUYẾN",
-  KSNK = "PHÒNG ĐIỀU DƯỠNG - DINH DƯỠNG - KIỂM SOÁT NHIỂM KHUẨN ",
-  TCHC = "PHÒNG TỔ CHỨC HÀNH CHÍNH",
-  TCKT = "PHÒNG TÀI CHÍNH KẾ TOÁN",
-  GD = "BAN GIÁM ĐỐC",
+export interface IDepartment {
+  id?: number;
+  name?: string;
+  description?: string;
 }
+
 export enum IClassification {
   A = "A",
   B = "B",
@@ -94,7 +89,7 @@ export interface Device {
   classification: IClassification;
   category: ICategory;
   location: ELocation;
-  department: IDepartment;
+  department: string;
   timeCheck: string;
   maintenance: string;
   image: string;

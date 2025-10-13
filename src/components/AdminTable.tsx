@@ -31,7 +31,7 @@ const dataSource = Array.from({ length: 100 }).map<Device>((_, i) => ({
   classification: IClassification.A,
   category: ICategory.CDHA,
   location: ELocation.HSCC,
-  department: IDepartment.HSCC,
+  department: "",
   timeCheck: "2022-01-01",
   maintenance: "Maintenance 1",
   image: "Image 1",
@@ -40,6 +40,14 @@ const dataSource = Array.from({ length: 100 }).map<Device>((_, i) => ({
 
 const App: React.FC<{ onEdit: (record: Device) => void }> = ({ onEdit }) => {
   const columns: TableColumnsType<Device> = [
+    {
+      title: "STT",
+      width: 100,
+      dataIndex: "index",
+      fixed: "left",
+      key: "index",
+      render: (_, record, index) => index + 1,
+    },
     {
       title: "Mã TTB",
       width: 100,
@@ -144,7 +152,8 @@ const App: React.FC<{ onEdit: (record: Device) => void }> = ({ onEdit }) => {
             color: "#000",
             padding: "2px 8px",
             borderRadius: "4px",
-          }}>
+          }}
+        >
           {record.classification}
         </span>
       ),
@@ -206,13 +215,15 @@ const App: React.FC<{ onEdit: (record: Device) => void }> = ({ onEdit }) => {
             icon={<FaEdit />}
             onClick={() => {
               onEdit(record);
-            }}>
+            }}
+          >
             Sửa
           </Button>
           <Button
             className="ml-2"
             icon={<FaShuffle />}
-            onClick={() => console.log("Chuyển Kho", record)}>
+            onClick={() => console.log("Chuyển Kho", record)}
+          >
             Chuyển Kho
           </Button>
           <Button
@@ -220,7 +231,8 @@ const App: React.FC<{ onEdit: (record: Device) => void }> = ({ onEdit }) => {
             type="primary"
             danger
             icon={<FaTrash />}
-            onClick={() => console.log("Xóa", record)}>
+            onClick={() => console.log("Xóa", record)}
+          >
             Xóa
           </Button>
         </div>

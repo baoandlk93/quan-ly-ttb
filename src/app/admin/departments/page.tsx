@@ -1,44 +1,57 @@
 "use client";
-import AddRoleForm from "@/components/form/AddRoleForm";
-import { IRole } from "@/server/entity";
-import { Button, Modal, Table, TableColumnsType } from "antd";
+import { IDepartment } from "@/server/entity";
+import { Button, Input, Modal, Table, TableColumnsType } from "antd";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { Form } from "antd";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function Departments() {
   const [open, setOpen] = useState(false);
-  const [dataSource, setDataSource] = useState<IRole[]>([]);
-  const [editingRole, setEditingRole] = useState<IRole | null>(null);
+  const [dataSource, setDataSource] = useState<IDepartment[]>([]);
+  const [editingDepartment, setEditingDepartment] =
+    useState<IDepartment | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [modalText, setModalText] = useState("Content of the modal");
+  const [form] = Form.useForm();
   const handleAdd = () => {
     setOpen(true);
   };
-  const submitForm = (data: IRole) => {
-    setOpen(false);
-    console.log(data);
-  };
 
-  const onEdit = (record: IRole) => {
+  const onEdit = (record: IDepartment) => {
     setOpen(true);
-    setEditingRole(record);
+    setEditingDepartment(record);
   };
-
+  const fetchDepartments = async () => {
+    const response = await fetch(
+      "http://localhost:8080/api/departments?page=0&size=10&name="
+    );
+    const data = await response.json();
+    setDataSource(data.content);
+  };
   useEffect(() => {
-    const fetchRoles = async () => {
-      const response = await fetch(
-        "http://localhost:8080/api/roles?page=0&size=10&name="
-      );
-      const data = await response.json();
-      console.log(data);
-      setDataSource(data.content);
-    };
-    fetchRoles();
+    fetchDepartments();
   }, []);
-  const columns: TableColumnsType<IRole> = [
+  useEffect(() => {
+    if (editingDepartment) {
+      form.setFieldsValue(editingDepartment);
+    } else {
+      form.resetFields();
+    }
+  }, [editingDepartment]);
+  const columns: TableColumnsType<IDepartment> = [
     {
-      title: "Tên vai trò",
+      title: "STT",
+      width: 100,
+      dataIndex: "index",
+      fixed: "left",
+      key: "index",
+      render: (_, record, index) => index + 1,
+    },
+    {
+      title: "Tên Khoa/Phòng",
       width: 100,
       dataIndex: "name",
       fixed: "left",
@@ -64,7 +77,8 @@ export default function Departments() {
             icon={<FaEdit />}
             onClick={() => {
               onEdit(record);
-            }}>
+            }}
+          >
             Sửa
           </Button>
           <Button
@@ -74,8 +88,9 @@ export default function Departments() {
             icon={<FaTrash />}
             onClick={() => {
               setOpenDelete(true);
-              setModalText("Bạn có chắc chắn muốn xóa vai trò này?");
-            }}>
+              setModalText("Bạn có chắc chắn muốn xóa Khoa/Phòng này?");
+            }}
+          >
             Xóa
           </Button>
         </div>
@@ -83,7 +98,7 @@ export default function Departments() {
     },
   ];
   const handleOk = () => {
-    setModalText("Đang xóa vai trò");
+    setModalText("Đang xóa Khoa/Phòng");
     setConfirmLoading(true);
     setTimeout(() => {
       setOpenDelete(false);
@@ -94,6 +109,34 @@ export default function Departments() {
   const handleCancel = () => {
     console.log("Clicked cancel button");
     setOpenDelete(false);
+  };
+
+  const handleFinish = async (value: IDepartment) => {
+    try {
+      const method = editingDepartment ? "PUT" : "POST";
+      const response = await axios({
+        url: `http://localhost:8080/api/departments`,
+        method: method,
+        headers: { "Content-Type": "application/json" },
+        data: JSON.stringify(value),
+      }).then((res) => res.data);
+
+      // Xử lý lỗi phía server trả về
+      if (!response) {
+        throw new Error("Có lỗi xảy ra trên server!");
+      }
+      toast.success(
+        editingDepartment
+          ? "Cập nhật Khoa/Phòng thành công!"
+          : "Thêm Khoa/Phòng mới thành công!"
+      );
+      form.resetFields();
+      setOpen(false);
+      fetchDepartments();
+    } catch (error: any) {
+      console.error("Error:", error);
+      toast.error(error.message || "Lỗi khi thêm/cập nhật kho!");
+    }
   };
   return (
     <>
@@ -112,15 +155,50 @@ export default function Departments() {
         closeIcon={false}
         centered
         width={600}
-        onCancel={() => setOpen(false)}>
-        <AddRoleForm onSuccess={submitForm} editingRole={editingRole} />
+        onCancel={() => {
+          setOpen(false);
+          setEditingDepartment(null);
+        }}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleFinish}
+          style={{ maxWidth: 400, margin: "0 auto" }}
+        >
+          <Form.Item label="Mã" hidden name="id">
+            <Input hidden />
+          </Form.Item>
+          <Form.Item
+            label="Tên Khoa/Phòng"
+            name="name"
+            rules={[
+              { required: true, message: "Vui lòng nhập tên Khoa/Phòng!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Mô tả"
+            name="description"
+            rules={[{ required: true, message: "Nhập mô tả" }]}
+          >
+            <Input placeholder="Ví dụ: Kho Nhà thuốc" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Lưu khoa/Phòng
+            </Button>
+          </Form.Item>
+        </Form>
       </Modal>
       <Modal
         title="Basic Modal"
         open={openDelete}
         onOk={handleOk}
         confirmLoading={confirmLoading}
-        onCancel={handleCancel}>
+        onCancel={handleCancel}
+      >
         <p>{modalText}</p>
       </Modal>
     </>

@@ -1,15 +1,17 @@
 "use client";
-import { IRole } from "@/server/entity";
+import { ICategory, IRole } from "@/server/entity";
 import { Button, Form, Input, Modal, Table, TableColumnsType } from "antd";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
 
-export default function Warehouses() {
+export default function CategoryEquipment() {
   const [open, setOpen] = useState(false);
-  const [dataSource, setDataSource] = useState<IRole[]>([]);
-  const [editingWarehouse, setEditingWarehouse] = useState<IRole | null>(null);
+  const [dataSource, setDataSource] = useState<ICategory[]>([]);
+  const [editingCategory, setEditingCategory] = useState<ICategory | null>(
+    null
+  );
   const [openDelete, setOpenDelete] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [modalText, setModalText] = useState("Content of the modal");
@@ -22,13 +24,13 @@ export default function Warehouses() {
     console.log(data);
   };
 
-  const onEdit = (record: IRole) => {
+  const onEdit = (record: ICategory) => {
     setOpen(true);
-    setEditingWarehouse(record);
+    setEditingCategory(record);
   };
-  const fetchWarehouses = async () => {
+  const fetchCategories = async () => {
     const response = await axios({
-      url: "http://localhost:8080/api/warehouses",
+      url: "http://localhost:8080/api/categories",
       method: "GET",
       headers: { "Content-Type": "application/json" },
       params: {
@@ -42,17 +44,9 @@ export default function Warehouses() {
   };
 
   useEffect(() => {
-    fetchWarehouses();
+    fetchCategories();
   }, []);
-  const columns: TableColumnsType<IRole> = [
-    {
-      title: "STT",
-      width: 100,
-      dataIndex: "index",
-      fixed: "left",
-      key: "index",
-      render: (_, record, index) => index + 1,
-    },
+  const columns: TableColumnsType<ICategory> = [
     {
       title: "Tên Kho",
       width: 100,
@@ -108,11 +102,11 @@ export default function Warehouses() {
       setConfirmLoading(false);
     }, 2000);
   };
-  const handleFinish = async (value: IRole) => {
+  const handleFinish = async (value: ICategory) => {
     try {
-      const method = editingWarehouse ? "PUT" : "POST";
+      const method = editingCategory ? "PUT" : "POST";
       const response = await axios({
-        url: `http://localhost:8080/api/warehouses`,
+        url: `http://localhost:8080/api/categories`,
         method: method,
         headers: { "Content-Type": "application/json" },
         data: JSON.stringify(value),
@@ -125,13 +119,13 @@ export default function Warehouses() {
 
       console.log(response);
       toast.success(
-        editingWarehouse
+        editingCategory
           ? "Cập nhật kho thành công!"
           : "Thêm kho mới thành công!"
       );
       form.resetFields();
       setOpen(false);
-      fetchWarehouses();
+      fetchCategories();
     } catch (error: any) {
       console.error("Error:", error);
       toast.error(error.message || "Lỗi khi thêm/cập nhật kho!");

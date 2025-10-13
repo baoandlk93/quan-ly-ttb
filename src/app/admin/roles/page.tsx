@@ -16,28 +16,34 @@ const RolesPage = () => {
   const handleAdd = () => {
     setOpen(true);
   };
-  const submitForm = (data: IRole) => {
+  const submitForm = () => {
     setOpen(false);
-    console.log(data);
+    fetchRoles();
   };
 
   const onEdit = (record: IRole) => {
     setOpen(true);
     setEditingRole(record);
   };
-
+  const fetchRoles = async () => {
+    const response = await fetch(
+      "http://localhost:8080/api/roles?page=0&size=10&name="
+    );
+    const data = await response.json();
+    setDataSource(data.content);
+  };
   useEffect(() => {
-    const fetchRoles = async () => {
-      const response = await fetch(
-        "http://localhost:8080/api/roles?page=0&size=10&name="
-      );
-      const data = await response.json();
-      console.log(data);
-      setDataSource(data.content);
-    };
     fetchRoles();
   }, []);
   const columns: TableColumnsType<IRole> = [
+    {
+      title: "STT",
+      width: 100,
+      dataIndex: "index",
+      fixed: "left",
+      key: "index",
+      render: (_, record, index) => index + 1,
+    },
     {
       title: "Tên vai trò",
       width: 100,
@@ -65,7 +71,8 @@ const RolesPage = () => {
             icon={<FaEdit />}
             onClick={() => {
               onEdit(record);
-            }}>
+            }}
+          >
             Sửa
           </Button>
           <Button
@@ -76,7 +83,8 @@ const RolesPage = () => {
             onClick={() => {
               setOpenDelete(true);
               setModalText("Bạn có chắc chắn muốn xóa vai trò này?");
-            }}>
+            }}
+          >
             Xóa
           </Button>
         </div>
@@ -113,7 +121,8 @@ const RolesPage = () => {
         closeIcon={false}
         centered
         width={600}
-        onCancel={() => setOpen(false)}>
+        onCancel={() => setOpen(false)}
+      >
         <AddRoleForm onSuccess={submitForm} editingRole={editingRole} />
       </Modal>
       <Modal
@@ -121,7 +130,8 @@ const RolesPage = () => {
         open={openDelete}
         onOk={handleOk}
         confirmLoading={confirmLoading}
-        onCancel={handleCancel}>
+        onCancel={handleCancel}
+      >
         <p>{modalText}</p>
       </Modal>
     </>

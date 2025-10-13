@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { IRole } from "@/server/entity";
 import axios from "axios";
 
-export default function AddMedicineForm({
+export default function AddRoleForm({
   onSuccess,
   editingRole,
 }: {
@@ -57,20 +57,23 @@ export default function AddMedicineForm({
       form={form}
       layout="vertical"
       onFinish={handleFinish}
-      style={{ maxWidth: 400, margin: "0 auto" }}>
+      style={{ maxWidth: 400, margin: "0 auto" }}
+    >
       <Form.Item label="Mã" hidden name="id">
         <Input hidden />
       </Form.Item>
       <Form.Item
         label="Tên vai trò"
         name="name"
-        rules={[{ required: true, message: "Vui lòng nhập tên vai trò!" }]}>
+        rules={[{ required: true, message: "Vui lòng nhập tên vai trò!" }]}
+      >
         <Input />
       </Form.Item>
       <Form.Item
         label="Mô tả"
         name="description"
-        rules={[{ required: true, message: "Nhập mô tả" }]}>
+        rules={[{ required: true, message: "Nhập mô tả" }]}
+      >
         <Input placeholder="Ví dụ: Vai trò quản trị" />
       </Form.Item>
       <Form.Item>
