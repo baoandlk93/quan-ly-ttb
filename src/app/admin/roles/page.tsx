@@ -1,5 +1,6 @@
 "use client";
 import AddRoleForm from "@/components/form/AddRoleForm";
+import { fetchRoles } from "@/server/api";
 import { IRole } from "@/server/entity";
 import { Button, Modal, Table, TableColumnsType } from "antd";
 import { useEffect, useState } from "react";
@@ -18,22 +19,19 @@ const RolesPage = () => {
   };
   const submitForm = () => {
     setOpen(false);
-    fetchRoles();
+    fetchData();
   };
 
   const onEdit = (record: IRole) => {
     setOpen(true);
     setEditingRole(record);
   };
-  const fetchRoles = async () => {
-    const response = await fetch(
-      "http://localhost:8080/api/roles?page=0&size=10&name="
-    );
-    const data = await response.json();
-    setDataSource(data.content);
+
+  const fetchData = () => {
+    fetchRoles().then((res) => setDataSource(res));
   };
   useEffect(() => {
-    fetchRoles();
+    fetchData();
   }, []);
   const columns: TableColumnsType<IRole> = [
     {
@@ -71,8 +69,7 @@ const RolesPage = () => {
             icon={<FaEdit />}
             onClick={() => {
               onEdit(record);
-            }}
-          >
+            }}>
             Sửa
           </Button>
           <Button
@@ -83,8 +80,7 @@ const RolesPage = () => {
             onClick={() => {
               setOpenDelete(true);
               setModalText("Bạn có chắc chắn muốn xóa vai trò này?");
-            }}
-          >
+            }}>
             Xóa
           </Button>
         </div>
@@ -121,8 +117,7 @@ const RolesPage = () => {
         closeIcon={false}
         centered
         width={600}
-        onCancel={() => setOpen(false)}
-      >
+        onCancel={() => setOpen(false)}>
         <AddRoleForm onSuccess={submitForm} editingRole={editingRole} />
       </Modal>
       <Modal
@@ -130,8 +125,7 @@ const RolesPage = () => {
         open={openDelete}
         onOk={handleOk}
         confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-      >
+        onCancel={handleCancel}>
         <p>{modalText}</p>
       </Modal>
     </>

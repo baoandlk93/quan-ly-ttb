@@ -1,14 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
 import {
-  ICategory,
   Device,
   IClassification,
   IStatus,
   IStatusOfUse,
   ELocation,
   IDepartment,
+  ECategory,
+  IWarehouse,
+  ICategory,
 } from "@/server/entity";
+import { fetchDepartments } from "@/server/api";
 export default function AddEquipmentForm({
   initialData,
   onSubmit,
@@ -24,7 +27,7 @@ export default function AddEquipmentForm({
   const [assetSource, setAssetSource] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
-  const [category, setCategory] = useState<ICategory | "">("");
+  const [category, setCategory] = useState<ECategory | "">("");
   const [classification, setClassification] = useState<IClassification | "">(
     ""
   );
@@ -35,6 +38,8 @@ export default function AddEquipmentForm({
   const [timeOut, setTimeOut] = useState("");
   const [department, setDepartment] = useState("");
   const [departments, setDepartments] = useState<IDepartment[]>([]);
+  const [warehouses, setWarehouses] = useState<IWarehouse[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const [location, setLocation] = useState<ELocation | "">("");
   const [yearOfSupply, setYearOfSupply] = useState("");
   const [timeCheck, setTimeCheck] = useState("");
@@ -91,15 +96,9 @@ export default function AddEquipmentForm({
       setNote("");
     }
   }, [initialData]);
-  const fetchDepartments = async () => {
-    const response = await fetch(
-      "http://localhost:8080/api/departments?page=0&size=10&name="
-    );
-    const data = await response.json();
-    setDepartments(data.content);
-  };
+
   useEffect(() => {
-    fetchDepartments();
+    fetchDepartments().then((data) => setDepartments(data));
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -109,7 +108,7 @@ export default function AddEquipmentForm({
       deviceCode,
       price: Number(price),
       image,
-      category: category as ICategory,
+      category: category as ECategory,
       classification: classification as IClassification,
       location: location as ELocation,
       stock: Number(stock),
@@ -253,8 +252,7 @@ export default function AddEquipmentForm({
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                 value={location}
                 onChange={(e) => setLocation(e.target.value as ELocation)}
-                required
-              >
+                required>
                 <option value="" disabled>
                   Chọn vị trí...
                 </option>
@@ -273,8 +271,7 @@ export default function AddEquipmentForm({
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                 value={statusOfUse}
                 onChange={(e) => setStatusOfUse(e.target.value as IStatusOfUse)}
-                required
-              >
+                required>
                 <option value="" disabled>
                   Chọn tình trạng sử dụng...
                 </option>
@@ -308,8 +305,7 @@ export default function AddEquipmentForm({
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as IStatus)}
-                required
-              >
+                required>
                 <option value="" disabled>
                   Chọn tình trạng TTB YT...
                 </option>
@@ -403,13 +399,12 @@ export default function AddEquipmentForm({
               <select
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                 value={category}
-                onChange={(e) => setCategory(e.target.value as ICategory)}
-                required
-              >
+                onChange={(e) => setCategory(e.target.value as ECategory)}
+                required>
                 <option value="" disabled>
                   Chọn loại thiết bị...
                 </option>
-                {Object.entries(ICategory).map(([key, value]) => (
+                {Object.entries(ECategory).map(([key, value]) => (
                   <option key={key} value={value}>
                     {value}
                   </option>
@@ -426,8 +421,7 @@ export default function AddEquipmentForm({
                 onChange={(e) =>
                   setClassification(e.target.value as IClassification)
                 }
-                required
-              >
+                required>
                 <option value="" disabled>
                   Chọn phân loại TTB...
                 </option>
@@ -446,8 +440,7 @@ export default function AddEquipmentForm({
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                 value={department}
                 onChange={(e) => setDepartment(e.target.value)}
-                required
-              >
+                required>
                 <option value="" disabled>
                   Chọn khoa/phòng...
                 </option>
@@ -491,14 +484,12 @@ export default function AddEquipmentForm({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition"
-          >
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-semibold transition">
             Huỷ
           </button>
           <button
             type="submit"
-            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow transition"
-          >
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow transition">
             {initialData ? "Cập nhật" : "Thêm mới"}
           </button>
         </div>

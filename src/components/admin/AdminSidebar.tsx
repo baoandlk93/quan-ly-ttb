@@ -18,6 +18,11 @@ export default function AdminSidebar() {
             Quản lý trang thiết bị
           </Link>
           <Link
+            href="/admin/category-equipment"
+            className="hover:bg-white/10 px-3 py-2 rounded-full">
+            Quản lý nhóm thiết bị
+          </Link>
+          <Link
             href="/admin/roles"
             className="hover:bg-white/10 px-3 py-2 rounded-full">
             Quản lý vai trò

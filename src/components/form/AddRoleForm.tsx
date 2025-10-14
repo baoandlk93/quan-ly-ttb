@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Form, Input, Button } from "antd";
 import { toast } from "react-toastify";
 import { IRole } from "@/server/entity";
-import axios from "axios";
+import { addRoles } from "@/server/api";
 
 export default function AddRoleForm({
   onSuccess,
@@ -26,19 +26,11 @@ export default function AddRoleForm({
   const handleFinish = async (value: IRole) => {
     try {
       const method = editingRole ? "PUT" : "POST";
-      const response = await axios({
-        url: `http://localhost:8080/api/roles`,
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        data: JSON.stringify(value),
-      }).then((res) => res.data);
-
+      const response = addRoles(method, value).then((res) => res);
       // Xử lý lỗi phía server trả về
       if (!response) {
         throw new Error("Có lỗi xảy ra trên server!");
       }
-
-      console.log(response);
       toast.success(
         editingRole
           ? "Cập nhật vai trò thành công!"
@@ -57,23 +49,20 @@ export default function AddRoleForm({
       form={form}
       layout="vertical"
       onFinish={handleFinish}
-      style={{ maxWidth: 400, margin: "0 auto" }}
-    >
+      style={{ maxWidth: 400, margin: "0 auto" }}>
       <Form.Item label="Mã" hidden name="id">
         <Input hidden />
       </Form.Item>
       <Form.Item
         label="Tên vai trò"
         name="name"
-        rules={[{ required: true, message: "Vui lòng nhập tên vai trò!" }]}
-      >
+        rules={[{ required: true, message: "Vui lòng nhập tên vai trò!" }]}>
         <Input />
       </Form.Item>
       <Form.Item
         label="Mô tả"
         name="description"
-        rules={[{ required: true, message: "Nhập mô tả" }]}
-      >
+        rules={[{ required: true, message: "Nhập mô tả" }]}>
         <Input placeholder="Ví dụ: Vai trò quản trị" />
       </Form.Item>
       <Form.Item>

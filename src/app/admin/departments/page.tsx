@@ -4,8 +4,8 @@ import { Button, Input, Modal, Table, TableColumnsType } from "antd";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { Form } from "antd";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { addDepartments, fetchDepartments } from "@/server/api";
 
 export default function Departments() {
   const [open, setOpen] = useState(false);
@@ -24,15 +24,11 @@ export default function Departments() {
     setOpen(true);
     setEditingDepartment(record);
   };
-  const fetchDepartments = async () => {
-    const response = await fetch(
-      "http://localhost:8080/api/departments?page=0&size=10&name="
-    );
-    const data = await response.json();
-    setDataSource(data.content);
+  const fetchData = () => {
+    fetchDepartments().then((res) => setDataSource(res));
   };
   useEffect(() => {
-    fetchDepartments();
+    fetchData();
   }, []);
   useEffect(() => {
     if (editingDepartment) {
@@ -77,8 +73,7 @@ export default function Departments() {
             icon={<FaEdit />}
             onClick={() => {
               onEdit(record);
-            }}
-          >
+            }}>
             Sửa
           </Button>
           <Button
@@ -89,8 +84,7 @@ export default function Departments() {
             onClick={() => {
               setOpenDelete(true);
               setModalText("Bạn có chắc chắn muốn xóa Khoa/Phòng này?");
-            }}
-          >
+            }}>
             Xóa
           </Button>
         </div>
@@ -114,13 +108,7 @@ export default function Departments() {
   const handleFinish = async (value: IDepartment) => {
     try {
       const method = editingDepartment ? "PUT" : "POST";
-      const response = await axios({
-        url: `http://localhost:8080/api/departments`,
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        data: JSON.stringify(value),
-      }).then((res) => res.data);
-
+      const response = addDepartments(method, value);
       // Xử lý lỗi phía server trả về
       if (!response) {
         throw new Error("Có lỗi xảy ra trên server!");
@@ -132,7 +120,7 @@ export default function Departments() {
       );
       form.resetFields();
       setOpen(false);
-      fetchDepartments();
+      fetchData();
     } catch (error: any) {
       console.error("Error:", error);
       toast.error(error.message || "Lỗi khi thêm/cập nhật kho!");
@@ -158,14 +146,12 @@ export default function Departments() {
         onCancel={() => {
           setOpen(false);
           setEditingDepartment(null);
-        }}
-      >
+        }}>
         <Form
           form={form}
           layout="vertical"
           onFinish={handleFinish}
-          style={{ maxWidth: 400, margin: "0 auto" }}
-        >
+          style={{ maxWidth: 400, margin: "0 auto" }}>
           <Form.Item label="Mã" hidden name="id">
             <Input hidden />
           </Form.Item>
@@ -174,15 +160,13 @@ export default function Departments() {
             name="name"
             rules={[
               { required: true, message: "Vui lòng nhập tên Khoa/Phòng!" },
-            ]}
-          >
+            ]}>
             <Input />
           </Form.Item>
           <Form.Item
             label="Mô tả"
             name="description"
-            rules={[{ required: true, message: "Nhập mô tả" }]}
-          >
+            rules={[{ required: true, message: "Nhập mô tả" }]}>
             <Input placeholder="Ví dụ: Kho Nhà thuốc" />
           </Form.Item>
           <Form.Item>
@@ -197,8 +181,7 @@ export default function Departments() {
         open={openDelete}
         onOk={handleOk}
         confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-      >
+        onCancel={handleCancel}>
         <p>{modalText}</p>
       </Modal>
     </>

@@ -4,7 +4,7 @@ import { Button, Form, Input, Modal, Table, TableColumnsType } from "antd";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import axios from "axios";
+import { addCategory, fetchCategories } from "@/server/api";
 
 export default function CategoryEquipment() {
   const [open, setOpen] = useState(false);
@@ -28,27 +28,15 @@ export default function CategoryEquipment() {
     setOpen(true);
     setEditingCategory(record);
   };
-  const fetchCategories = async () => {
-    const response = await axios({
-      url: "http://localhost:8080/api/categories",
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      params: {
-        number: 0,
-        size: 20,
-      },
-    });
-    const data = await response.data;
-    console.log(data);
-    setDataSource(data.content);
+  const fetchData = () => {
+    fetchCategories().then((data) => setDataSource(data));
   };
-
   useEffect(() => {
-    fetchCategories();
+    fetchData();
   }, []);
   const columns: TableColumnsType<ICategory> = [
     {
-      title: "Tên Kho",
+      title: "Tên nhóm thiết bị",
       width: 100,
       dataIndex: "name",
       fixed: "left",
@@ -74,8 +62,7 @@ export default function CategoryEquipment() {
             icon={<FaEdit />}
             onClick={() => {
               onEdit(record);
-            }}
-          >
+            }}>
             Sửa
           </Button>
           <Button
@@ -86,8 +73,7 @@ export default function CategoryEquipment() {
             onClick={() => {
               setOpenDelete(true);
               setModalText("Bạn có chắc chắn muốn xóa kho này?");
-            }}
-          >
+            }}>
             Xóa
           </Button>
         </div>
@@ -95,7 +81,7 @@ export default function CategoryEquipment() {
     },
   ];
   const handleOk = () => {
-    setModalText("Đang xóa kho");
+    setModalText("Đang xóa nhóm thiết bị");
     setConfirmLoading(true);
     setTimeout(() => {
       setOpenDelete(false);
@@ -105,19 +91,11 @@ export default function CategoryEquipment() {
   const handleFinish = async (value: ICategory) => {
     try {
       const method = editingCategory ? "PUT" : "POST";
-      const response = await axios({
-        url: `http://localhost:8080/api/categories`,
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        data: JSON.stringify(value),
-      }).then((res) => res.data);
-
+      const response = addCategory(method, value);
       // Xử lý lỗi phía server trả về
       if (!response) {
         throw new Error("Có lỗi xảy ra trên server!");
       }
-
-      console.log(response);
       toast.success(
         editingCategory
           ? "Cập nhật kho thành công!"
@@ -125,7 +103,7 @@ export default function CategoryEquipment() {
       );
       form.resetFields();
       setOpen(false);
-      fetchCategories();
+      fetchData();
     } catch (error: any) {
       console.error("Error:", error);
       toast.error(error.message || "Lỗi khi thêm/cập nhật kho!");
@@ -139,7 +117,7 @@ export default function CategoryEquipment() {
   return (
     <>
       <div className="flex flex-col gap-4 p-4">
-        <h1>Quản lý Kho</h1>
+        <h1>Quản lý nhóm thiết bị</h1>
         <div>
           <Button type="primary" onClick={handleAdd}>
             Thêm mới
@@ -157,30 +135,26 @@ export default function CategoryEquipment() {
         closeIcon={false}
         centered
         width={600}
-        onCancel={() => setOpen(false)}
-      >
+        onCancel={() => setOpen(false)}>
         <Form
           form={form}
           layout="vertical"
           onFinish={handleFinish}
-          style={{ maxWidth: 400, margin: "0 auto" }}
-        >
+          style={{ maxWidth: 400, margin: "0 auto" }}>
           <Form.Item label="Mã" hidden name="id">
             <Input hidden />
           </Form.Item>
           <Form.Item
-            label="Tên kho"
+            label="Tên nhóm thiết bị"
             name="name"
-            rules={[{ required: true, message: "Vui lòng nhập tên kho!" }]}
-          >
+            rules={[{ required: true, message: "Vui lòng nhập tên kho!" }]}>
             <Input />
           </Form.Item>
           <Form.Item
             label="Mô tả"
             name="description"
-            rules={[{ required: true, message: "Nhập mô tả" }]}
-          >
-            <Input placeholder="Ví dụ: Kho Nhà thuốc" />
+            rules={[{ required: true, message: "Nhập mô tả" }]}>
+            <Input placeholder="Ví dụ: Nhóm thiết bị y tế" />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -194,8 +168,7 @@ export default function CategoryEquipment() {
         open={openDelete}
         onOk={handleOk}
         confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-      >
+        onCancel={handleCancel}>
         <p>{modalText}</p>
       </Modal>
     </>

@@ -5,10 +5,9 @@ import {
   Device,
   IStatusOfUse,
   IStatus,
-  ICategory,
   ELocation,
-  IDepartment,
   IClassification,
+  ECategory,
 } from "@/server/entity";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { FaShuffle } from "react-icons/fa6";
@@ -29,7 +28,7 @@ const dataSource = Array.from({ length: 100 }).map<Device>((_, i) => ({
   timeUse: "1 năm",
   stock: 10,
   classification: IClassification.A,
-  category: ICategory.CDHA,
+  category: ECategory.CDHA,
   location: ELocation.HSCC,
   department: "",
   timeCheck: "2022-01-01",
@@ -38,7 +37,9 @@ const dataSource = Array.from({ length: 100 }).map<Device>((_, i) => ({
   note: "Note 1",
 }));
 
-const App: React.FC<{ onEdit: (record: Device) => void }> = ({ onEdit }) => {
+const EquipmentTable: React.FC<{ onEdit: (record: Device) => void }> = ({
+  onEdit,
+}) => {
   const columns: TableColumnsType<Device> = [
     {
       title: "STT",
@@ -152,8 +153,7 @@ const App: React.FC<{ onEdit: (record: Device) => void }> = ({ onEdit }) => {
             color: "#000",
             padding: "2px 8px",
             borderRadius: "4px",
-          }}
-        >
+          }}>
           {record.classification}
         </span>
       ),
@@ -215,15 +215,13 @@ const App: React.FC<{ onEdit: (record: Device) => void }> = ({ onEdit }) => {
             icon={<FaEdit />}
             onClick={() => {
               onEdit(record);
-            }}
-          >
+            }}>
             Sửa
           </Button>
           <Button
             className="ml-2"
             icon={<FaShuffle />}
-            onClick={() => console.log("Chuyển Kho", record)}
-          >
+            onClick={() => console.log("Chuyển Kho", record)}>
             Chuyển Kho
           </Button>
           <Button
@@ -231,8 +229,7 @@ const App: React.FC<{ onEdit: (record: Device) => void }> = ({ onEdit }) => {
             type="primary"
             danger
             icon={<FaTrash />}
-            onClick={() => console.log("Xóa", record)}
-          >
+            onClick={() => console.log("Xóa", record)}>
             Xóa
           </Button>
         </div>
@@ -248,4 +245,4 @@ const App: React.FC<{ onEdit: (record: Device) => void }> = ({ onEdit }) => {
   );
 };
 
-export default App;
+export default EquipmentTable;

@@ -1,13 +1,21 @@
 "use client";
-
-import AdminTable from "@/components/AdminTable";
 import { Button, Modal } from "antd";
 import AddEquipmentForm from "@/components/admin/products/AddEquipmentForm";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Device } from "@/server/entity";
+import { fetchEquipment } from "@/server/api";
+import EquipmentTable from "@/components/EquipmentTable";
 export default function QuanLyTrangThietBiPage() {
   const [open, setOpen] = useState(false);
   const [initialData, setInitialData] = useState<Device | null>(null);
+  const [dataSource, setDataSource] = useState<Device[] | []>([]);
+  const fetchData = () => {
+    fetchEquipment().then((res) => setDataSource(res));
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
   const onSubmit = (value: Device) => {
     console.log(value);
   };
@@ -36,7 +44,7 @@ export default function QuanLyTrangThietBiPage() {
           Thêm mới
         </Button>
       </div>
-      <AdminTable onEdit={handleEdit} />
+      <EquipmentTable onEdit={handleEdit} />
       <Modal
         open={open}
         footer={null}

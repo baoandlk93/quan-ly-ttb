@@ -33,7 +33,11 @@ export enum IStatusOfUse {
   USING = "Sử dụng",
   NOT_USING = "Không sử dụng",
 }
-export enum ICategory {
+export interface ICategory {
+  id?: number;
+  name?: string;
+}
+export enum ECategory {
   CDHA = "Thiết bị chẩn đoán hình ảnh",
   HSCC = "Thiết bị hồi sức - cấp cứu",
   XN = "Thiết bị xét nghiệm",
@@ -87,7 +91,7 @@ export interface Device {
   timeUse: string;
   stock: number;
   classification: IClassification;
-  category: ICategory;
+  category: ECategory;
   location: ELocation;
   department: string;
   timeCheck: string;

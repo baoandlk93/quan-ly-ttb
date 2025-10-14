@@ -4,7 +4,7 @@ import { Button, Form, Input, Modal, Table, TableColumnsType } from "antd";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import axios from "axios";
+import { addWarehouse, fetchWarehouse } from "@/server/api";
 
 export default function Warehouses() {
   const [open, setOpen] = useState(false);
@@ -26,23 +26,12 @@ export default function Warehouses() {
     setOpen(true);
     setEditingWarehouse(record);
   };
-  const fetchWarehouses = async () => {
-    const response = await axios({
-      url: "http://localhost:8080/api/warehouses",
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      params: {
-        number: 0,
-        size: 20,
-      },
-    });
-    const data = await response.data;
-    console.log(data);
-    setDataSource(data.content);
+  const fetchData = () => {
+    fetchWarehouse().then((res) => setDataSource(res));
   };
 
   useEffect(() => {
-    fetchWarehouses();
+    fetchData();
   }, []);
   const columns: TableColumnsType<IRole> = [
     {
@@ -80,8 +69,7 @@ export default function Warehouses() {
             icon={<FaEdit />}
             onClick={() => {
               onEdit(record);
-            }}
-          >
+            }}>
             Sửa
           </Button>
           <Button
@@ -92,8 +80,7 @@ export default function Warehouses() {
             onClick={() => {
               setOpenDelete(true);
               setModalText("Bạn có chắc chắn muốn xóa kho này?");
-            }}
-          >
+            }}>
             Xóa
           </Button>
         </div>
@@ -111,13 +98,7 @@ export default function Warehouses() {
   const handleFinish = async (value: IRole) => {
     try {
       const method = editingWarehouse ? "PUT" : "POST";
-      const response = await axios({
-        url: `http://localhost:8080/api/warehouses`,
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        data: JSON.stringify(value),
-      }).then((res) => res.data);
-
+      const response = addWarehouse(method, value);
       // Xử lý lỗi phía server trả về
       if (!response) {
         throw new Error("Có lỗi xảy ra trên server!");
@@ -131,7 +112,7 @@ export default function Warehouses() {
       );
       form.resetFields();
       setOpen(false);
-      fetchWarehouses();
+      fetchData();
     } catch (error: any) {
       console.error("Error:", error);
       toast.error(error.message || "Lỗi khi thêm/cập nhật kho!");
@@ -163,29 +144,25 @@ export default function Warehouses() {
         closeIcon={false}
         centered
         width={600}
-        onCancel={() => setOpen(false)}
-      >
+        onCancel={() => setOpen(false)}>
         <Form
           form={form}
           layout="vertical"
           onFinish={handleFinish}
-          style={{ maxWidth: 400, margin: "0 auto" }}
-        >
+          style={{ maxWidth: 400, margin: "0 auto" }}>
           <Form.Item label="Mã" hidden name="id">
             <Input hidden />
           </Form.Item>
           <Form.Item
             label="Tên kho"
             name="name"
-            rules={[{ required: true, message: "Vui lòng nhập tên kho!" }]}
-          >
+            rules={[{ required: true, message: "Vui lòng nhập tên kho!" }]}>
             <Input />
           </Form.Item>
           <Form.Item
             label="Mô tả"
             name="description"
-            rules={[{ required: true, message: "Nhập mô tả" }]}
-          >
+            rules={[{ required: true, message: "Nhập mô tả" }]}>
             <Input placeholder="Ví dụ: Kho Nhà thuốc" />
           </Form.Item>
           <Form.Item>
@@ -200,8 +177,7 @@ export default function Warehouses() {
         open={openDelete}
         onOk={handleOk}
         confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-      >
+        onCancel={handleCancel}>
         <p>{modalText}</p>
       </Modal>
     </>
