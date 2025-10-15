@@ -275,7 +275,7 @@ export default function AddEquipmentForm({
                 <option value="" disabled>
                   Chọn tình trạng sử dụng...
                 </option>
-                {Object.entries(IStatus).map(([key, value]) => (
+                {Object.entries(IStatusOfUse).map(([key, value]) => (
                   <option key={key} value={value}>
                     {value}
                   </option>
@@ -378,7 +378,7 @@ export default function AddEquipmentForm({
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
                 required
-                placeholder="Dán đường dẫn ảnh sản phẩm..."
+                placeholder="Dán đường dẫn ảnh thiết bị..."
               />
               {image && (
                 <div className="mt-2 flex justify-center">
