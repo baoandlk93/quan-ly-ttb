@@ -15,11 +15,11 @@ export default function Register() {
   const { register, handleSubmit } = useForm<IFormInput>();
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
     const user: IUser = {
-      id: "",
+      id: 0,
       fullName: data.name,
       username: data.username,
       password: data.password,
-      role: ERole.USER,
+      role: ERole.ADMIN,
       address: "",
       email: "",
       phoneNumber: "",
@@ -32,14 +32,19 @@ export default function Register() {
       },
       data: JSON.stringify(user),
     })
-      .then((res) => {})
-      .catch((e) => {});
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col space-y-4 text-black">
+      className="flex flex-col space-y-4 text-black"
+    >
       <input
         {...register("name")}
         type="text"
@@ -74,7 +79,8 @@ export default function Register() {
       />
       <button
         type="submit"
-        className="bg-gradient-to-r from-blue-500 to-fuchsia-500 py-3 rounded-lg text-white font-semibold shadow hover:scale-105 transition">
+        className="bg-gradient-to-r from-blue-500 to-fuchsia-500 py-3 rounded-lg text-white font-semibold shadow hover:scale-105 transition"
+      >
         Đăng ký
       </button>
     </form>

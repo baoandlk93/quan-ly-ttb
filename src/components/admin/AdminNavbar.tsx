@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { setUserToLocalStorage } from "@/ultilities/security";
+import { useRouter } from "next/navigation";
 export default function AdminNavbar() {
+  const router = useRouter();
   return (
     <header className="w-full h-16 px-6 flex items-center justify-between bg-white/80 shadow sticky top-0 z-20 backdrop-blur">
       {/* Logo hoặc tên hệ thống */}
@@ -23,8 +26,11 @@ export default function AdminNavbar() {
         {/* Nút đăng xuất hoặc menu dropdown */}
         <button
           onClick={() => {
+            setUserToLocalStorage(null);
+            router.push("/");
           }}
-          className="text-red-500 px-3 py-1 rounded hover:bg-red-50">
+          className="text-red-500 px-3 py-1 rounded hover:bg-red-50"
+        >
           Đăng xuất
         </button>
       </div>

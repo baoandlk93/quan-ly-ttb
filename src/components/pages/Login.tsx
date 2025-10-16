@@ -1,13 +1,14 @@
 "use client";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-export default function Login({
-  onLoginSuccess,
-}: {
-  onLoginSuccess?: () => void;
-}) {
+import axios from "axios";
+import {
+  setUserToLocalStorage,
+  getUserFromLocalStorage,
+} from "@/ultilities/security";
+import { ERole } from "@/server/entity";
+export default function Login() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -15,21 +16,28 @@ export default function Login({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const res = await signIn("credentials", {
-      redirect: false,
-      username,
-      password,
-    });
+    await axios({
+      url: `http://localhost:8080/api/auth/login`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify({ username, password }),
+    })
+      .then((res) => {
+        setUserToLocalStorage(res.data.data);
+      })
+      .catch((e) => {
+        toast.error("Sai tài khoản hoặc mật khẩu. Vui lòng thử lại.");
+      });
+
     setLoading(false);
-    if (res?.ok) {
-      onLoginSuccess?.();
-      const sessionRes = await fetch("/api/auth/session");
-      const session = await sessionRes.json();
-      if (session.user?.role === "admin") {
+    if (getUserFromLocalStorage()) {
+      if (getUserFromLocalStorage()?.roles?.includes(ERole.ADMIN)) {
         toast.success("Chào mừng admin!");
         router.push("/admin");
       } else {
-        toast.success("Đăng nhập thành công!");
+        toast.success(" Đăng nhập thành công!");
         router.push("/");
       }
     } else {
