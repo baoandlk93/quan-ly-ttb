@@ -31,7 +31,8 @@ export enum IStatus {
 }
 export enum IStatusOfUse {
   USING = "Sử dụng",
-  NOT_USING = "Không sử dụng",
+  UNSED = "Không sử dụng",
+  MAINTENANCE = "Bảo trì",
 }
 export interface ICategory {
   id?: number;
@@ -76,26 +77,27 @@ export enum IClassification {
   D = "D",
 }
 export interface Device {
+  id: number;
   deviceCode: string;
   name: string;
   model: string;
   company: string;
   quantity: number;
   assetSource: string;
-  yearOfSupply: string;
+  yearOfSupply: number;
   price: number;
   statusOfUse: IStatusOfUse;
   status: IStatus;
   timeIn: string;
   timeOut: string;
-  timeUse: string;
+  timeUse: number;
   stock: number;
   classification: IClassification;
   category: ECategory;
   location: ELocation;
   department: string;
   timeCheck: string;
-  maintenance: string;
+  maintenance: number;
   image: string;
   note: string;
 }

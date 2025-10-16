@@ -1,6 +1,4 @@
-import { IUser } from "@/server/entity";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
 export default function AdminNavbar() {
   return (
     <header className="w-full h-16 px-6 flex items-center justify-between bg-white/80 shadow sticky top-0 z-20 backdrop-blur">
@@ -25,7 +23,6 @@ export default function AdminNavbar() {
         {/* Nút đăng xuất hoặc menu dropdown */}
         <button
           onClick={() => {
-            signOut();
           }}
           className="text-red-500 px-3 py-1 rounded hover:bg-red-50">
           Đăng xuất

@@ -112,6 +112,20 @@ export const addEquipment = async (method: string, value: Device) => {
     method: method,
     headers: { "Content-Type": "application/json" },
     data: JSON.stringify(value),
-  }).then((res) => res.data);
+  })
+    .then((res) => res.data)
+    .catch((e) => e);
+
+  return response;
+};
+
+export const removeEquipment = async (id: number) => {
+  const response = await axios({
+    url: `http://localhost:8080/api/equipments/${id}`,
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((res) => res.data)
+    .catch((e) => e);
   return response;
 };

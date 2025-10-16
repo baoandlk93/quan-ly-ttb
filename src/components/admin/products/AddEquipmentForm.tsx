@@ -11,7 +11,11 @@ import {
   IWarehouse,
   ICategory,
 } from "@/server/entity";
-import { fetchDepartments } from "@/server/api";
+import {
+  fetchCategories,
+  fetchDepartments,
+  fetchWarehouse,
+} from "@/server/api";
 export default function AddEquipmentForm({
   initialData,
   onSubmit,
@@ -21,6 +25,7 @@ export default function AddEquipmentForm({
   onSubmit: (data: Device) => Promise<void>;
   onClose: () => void;
 }) {
+  const [id, setId] = useState(0);
   const [name, setName] = useState("");
   const [deviceCode, setDeviceCode] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -33,7 +38,7 @@ export default function AddEquipmentForm({
   );
   const [statusOfUse, setStatusOfUse] = useState<IStatusOfUse | "">("");
   const [status, setStatus] = useState<IStatus | "">("");
-  const [timeUse, setTimeUse] = useState("");
+  const [timeUse, setTimeUse] = useState(0);
   const [timeIn, setTimeIn] = useState("");
   const [timeOut, setTimeOut] = useState("");
   const [department, setDepartment] = useState("");
@@ -41,7 +46,7 @@ export default function AddEquipmentForm({
   const [warehouses, setWarehouses] = useState<IWarehouse[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [location, setLocation] = useState<ELocation | "">("");
-  const [yearOfSupply, setYearOfSupply] = useState("");
+  const [yearOfSupply, setYearOfSupply] = useState(0);
   const [timeCheck, setTimeCheck] = useState("");
   const [maintenance, setMaintenance] = useState("");
   const [stock, setStock] = useState("");
@@ -51,11 +56,12 @@ export default function AddEquipmentForm({
 
   useEffect(() => {
     if (initialData) {
+      setId(initialData.id)
       setName(initialData.name || "");
       setDeviceCode(initialData.deviceCode || "");
-      setYearOfSupply(initialData.yearOfSupply || "");
+      setYearOfSupply(initialData.yearOfSupply || 0);
       setStock(initialData.stock.toString() || "");
-      setTimeUse(initialData.timeUse || "");
+      setTimeUse(initialData.timeUse || 0);
       setTimeIn(initialData.timeIn || "");
       setTimeOut(initialData.timeOut || "");
       setDepartment(initialData.department || "");
@@ -73,6 +79,7 @@ export default function AddEquipmentForm({
       setCompany(initialData.company || "");
       setNote(initialData.note || "");
     } else {
+      setId(0)
       setName("");
       setPrice("");
       setImage("");
@@ -80,8 +87,8 @@ export default function AddEquipmentForm({
       setStock("");
       setQuantity("");
       setAssetSource("");
-      setYearOfSupply("");
-      setTimeUse("");
+      setYearOfSupply(0);
+      setTimeUse(0);
       setTimeIn("");
       setTimeOut("");
       setDepartment("");
@@ -99,11 +106,14 @@ export default function AddEquipmentForm({
 
   useEffect(() => {
     fetchDepartments().then((data) => setDepartments(data));
+    fetchWarehouse().then((data) => setWarehouses(data));
+    fetchCategories().then((data) => setCategories(data));
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
+      id,
       name,
       deviceCode,
       price: Number(price),
@@ -124,7 +134,7 @@ export default function AddEquipmentForm({
       timeOut: timeOut,
       department: department,
       timeCheck: timeCheck,
-      maintenance: maintenance,
+      maintenance: Number(maintenance),
       note: note,
     });
     onClose();
@@ -136,350 +146,342 @@ export default function AddEquipmentForm({
         {initialData ? "Cập nhật thiết bị" : "Thêm thiết bị mới"}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="flex gap-2">
-          <div className="w-full">
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Mã TTB
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={deviceCode}
-                onChange={(e) => setDeviceCode(e.target.value)}
-                required
-                placeholder="Nhập mã TTB..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Tên TTB
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                placeholder="Nhập tên TTB..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Model, series
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                required
-                placeholder="Nhập model TTB..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Hãng,Nước SX
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                required
-                placeholder="Nhập hãng sản xuất..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Số lượng
-              </label>
-              <input
-                type="number"
-                min="0"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                required
-                placeholder="Nhập số lượng TTB..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Nguồn tài sản
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={assetSource}
-                onChange={(e) => setAssetSource(e.target.value)}
-                required
-                placeholder="Nhập nguồn tài sản..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Năm cấp
-              </label>
-              <input
-                type="date"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={yearOfSupply}
-                onChange={(e) => setYearOfSupply(e.target.value)}
-                required
-                placeholder="Nhập năm cấp TTB..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Giá TTB (VNĐ)
-              </label>
-              <input
-                type="number"
-                min="0"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                required
-                placeholder="Nhập giá TTB..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Vị trí
-              </label>
-              <select
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={location}
-                onChange={(e) => setLocation(e.target.value as ELocation)}
-                required>
-                <option value="" disabled>
-                  Chọn vị trí...
-                </option>
-                {Object.entries(ELocation).map(([key, value]) => (
-                  <option key={key} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Tình trạng sử dụng tài sản
-              </label>
-              <select
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={statusOfUse}
-                onChange={(e) => setStatusOfUse(e.target.value as IStatusOfUse)}
-                required>
-                <option value="" disabled>
-                  Chọn tình trạng sử dụng...
-                </option>
-                {Object.entries(IStatusOfUse).map(([key, value]) => (
-                  <option key={key} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Số năm sử dụng
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={timeUse}
-                onChange={(e) => setTimeUse(e.target.value)}
-                required
-                placeholder="Nhập số năm sử dụng..."
-              />
-            </div>
-          </div>
-          <div className="w-full">
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Tình trạng TTB YT
-              </label>
-              <select
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as IStatus)}
-                required>
-                <option value="" disabled>
-                  Chọn tình trạng TTB YT...
-                </option>
-                {Object.entries(IStatus).map(([key, value]) => (
-                  <option key={key} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Thời gian nhập kho
-              </label>
-              <input
-                type="date"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={timeIn}
-                onChange={(e) => setTimeIn(e.target.value)}
-                required
-                placeholder="Nhập thời gian nhập kho..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Thời gian xuất kho
-              </label>
-              <input
-                type="date"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={timeOut}
-                onChange={(e) => setTimeOut(e.target.value)}
-                required
-                placeholder="Nhập thời gian xuất kho..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Thời gian kiểm định
-              </label>
-              <input
-                type="date"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={timeCheck}
-                onChange={(e) => setTimeCheck(e.target.value)}
-                required
-                placeholder="Nhập thời gian kiểm định..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Tồn kho
-              </label>
-              <input
-                type="number"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-                required
-                placeholder="Nhập tồn kho..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Hình ảnh (URL)
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                required
-                placeholder="Dán đường dẫn ảnh thiết bị..."
-              />
-              {image && (
-                <div className="mt-2 flex justify-center">
-                  <img
-                    src={image}
-                    alt="Preview"
-                    width={100}
-                    height={100}
-                    className="h-24 w-24 object-cover rounded-lg border shadow"
-                  />
-                </div>
-              )}
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Loại thiết bị
-              </label>
-              <select
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={category}
-                onChange={(e) => setCategory(e.target.value as ECategory)}
-                required>
-                <option value="" disabled>
-                  Chọn loại thiết bị...
-                </option>
-                {Object.entries(ECategory).map(([key, value]) => (
-                  <option key={key} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Phân loại TTB ( A, B, C,D)
-              </label>
-              <select
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={classification}
-                onChange={(e) =>
-                  setClassification(e.target.value as IClassification)
-                }
-                required>
-                <option value="" disabled>
-                  Chọn phân loại TTB...
-                </option>
-                {Object.entries(IClassification).map(([key, value]) => (
-                  <option key={key} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Khoa/phòng
-              </label>
-              <select
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                required>
-                <option value="" disabled>
-                  Chọn khoa/phòng...
-                </option>
-                {departments?.map((item) => (
-                  <option key={item.id} value={item.name}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Số lượng
-              </label>
-              <input
-                type="number"
-                min="0"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-                required
-                placeholder="Nhập số lượng trong kho..."
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Ghi chú
-              </label>
-              <textarea
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition resize-none"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                required
-                rows={3}
-                placeholder="Nhập ghi chú..."
-              />
-            </div>
-          </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Mã TTB</label>
+          <input
+            type="text"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={deviceCode}
+            onChange={(e) => setDeviceCode(e.target.value)}
+            required
+            placeholder="Nhập mã TTB..."
+          />
         </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Tên TTB
+          </label>
+          <input
+            type="text"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            placeholder="Nhập tên TTB..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Model, series
+          </label>
+          <input
+            type="text"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+            required
+            placeholder="Nhập model TTB..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Hãng,Nước SX
+          </label>
+          <input
+            type="text"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            required
+            placeholder="Nhập hãng sản xuất..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Số lượng
+          </label>
+          <input
+            type="number"
+            min="0"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            required
+            placeholder="Nhập số lượng TTB..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Nguồn tài sản
+          </label>
+          <input
+            type="text"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={assetSource}
+            onChange={(e) => setAssetSource(e.target.value)}
+            required
+            placeholder="Nhập nguồn tài sản..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Năm cấp
+          </label>
+          <input
+            type="number"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={yearOfSupply}
+            onChange={(e) => setYearOfSupply(Number(e.target.value))}
+            required
+            placeholder="Nhập năm cấp TTB..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Giá TTB (VNĐ)
+          </label>
+          <input
+            type="number"
+            min="0"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            required
+            placeholder="Nhập giá TTB..."
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Tình trạng sử dụng tài sản
+          </label>
+          <select
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={statusOfUse}
+            onChange={(e) => setStatusOfUse(e.target.value as IStatusOfUse)}
+            required>
+            <option value="" disabled>
+              Chọn tình trạng sử dụng...
+            </option>
+            {Object.entries(IStatusOfUse).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Số năm sử dụng
+          </label>
+          <input
+            type="number"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={timeUse}
+            onChange={(e) => setTimeUse(Number(e.target.value))}
+            required
+            placeholder="Nhập số năm sử dụng..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Tình trạng TTB YT
+          </label>
+          <select
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as IStatus)}
+            required>
+            <option value="" disabled>
+              Chọn tình trạng TTB YT...
+            </option>
+            {Object.entries(IStatus).map(([key, value]) => (
+              <option key={key} value={key}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Thời gian nhập kho
+          </label>
+          <input
+            type="date"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={timeIn}
+            onChange={(e) => setTimeIn(e.target.value)}
+            required
+            placeholder="Nhập thời gian nhập kho..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Thời gian xuất kho
+          </label>
+          <input
+            type="date"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={timeOut}
+            onChange={(e) => setTimeOut(e.target.value)}
+            required
+            placeholder="Nhập thời gian xuất kho..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Thời gian kiểm định
+          </label>
+          <input
+            type="date"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={timeCheck}
+            onChange={(e) => setTimeCheck(e.target.value)}
+            required
+            placeholder="Nhập thời gian kiểm định..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Tồn kho
+          </label>
+          <input
+            type="number"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={stock}
+            onChange={(e) => setStock(e.target.value)}
+            required
+            placeholder="Nhập tồn kho..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Hình ảnh (URL)
+          </label>
+          <input
+            type="text"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            required
+            placeholder="Dán đường dẫn ảnh thiết bị..."
+          />
+          {image && (
+            <div className="mt-2 flex justify-center">
+              <img
+                src={image}
+                alt="Preview"
+                width={100}
+                height={100}
+                className="h-24 w-24 object-cover rounded-lg border shadow"
+              />
+            </div>
+          )}
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Nhóm thiết bị
+          </label>
+          <select
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={category}
+            onChange={(e) => setCategory(e.target.value as ECategory)}
+            required>
+            <option value="" disabled>
+              Chọn Nhóm thiết bị...
+            </option>
+            {Object.entries(categories).map(([key, value]) => (
+              <option key={key} value={value.name}>
+                {value.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Phân loại TTB ( A, B, C,D)
+          </label>
+          <select
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={classification}
+            onChange={(e) =>
+              setClassification(e.target.value as IClassification)
+            }
+            required>
+            <option value="" disabled>
+              Chọn phân loại TTB...
+            </option>
+            {Object.entries(IClassification).map(([key, value]) => (
+              <option key={key} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Khoa/phòng
+          </label>
+          <select
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={department}
+            onChange={(e) => setDepartment(e.target.value)}
+            required>
+            <option value="" disabled>
+              Chọn khoa/phòng...
+            </option>
+            {departments?.map((item) => (
+              <option key={item.id} value={item.name}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Vị trí</label>
+          <select
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={location}
+            onChange={(e) => setLocation(e.target.value as ELocation)}
+            required>
+            <option value="" disabled>
+              Chọn vị trí...
+            </option>
+            {Object.entries(warehouses).map(([key, value]) => (
+              <option key={key} value={value.name}>
+                {value.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Bảo dưỡng sửa chữa
+          </label>
+          <input
+            type="number"
+            min="0"
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            value={maintenance}
+            onChange={(e) => setMaintenance(e.target.value)}
+            required
+            placeholder="Nhập số lần bảo dưỡng sửa chữa TTB..."
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Ghi chú
+          </label>
+          <textarea
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition resize-none"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            required
+            rows={3}
+            placeholder="Nhập ghi chú..."
+          />
+        </div>
+
         <div className="flex justify-end gap-3 pt-2">
           <button
             type="button"
